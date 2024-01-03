@@ -32,5 +32,5 @@ def upload_file():
             return jsonify({"error": "No file selected for upload"})
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run(debug=True)
