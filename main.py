@@ -6,20 +6,31 @@ for now I'm planning on looking for an api or just scrape the quran off of a web
 and use speec recognition to get which verse is been read at when and use moviepy to edit a nice UI ofr the video incha allah
 then It's either youtube api or selenium to upload the final video, hope this will go as planned.
 '''
-import requests
-import base64
 
-with open("audio.wav", "rb") as f:
-    base64_encoded_data = base64.b64encode(f.read()).decode("utf-8")
+# this is the code for the flask that will handle the bas64 file encryption
+
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/get_data", methods=["GET"])
+def get_data():
+    data = {"message": "This is a GET response!"}
+    return jsonify(data)
+  
+
+@app.route("/upload_file", methods=["POST"])
+def upload_file():
+    if request.method == "POST":
+        uploaded_file = request.files["file"]  # Access the uploaded file object
+        if (a := uploaded_file.filename):  # Check for non-empty filename
+            uploaded_file.save(f"uploads/{a}")
+            return jsonify({"message": "File uploaded successfully!"})
+        else:
+            return jsonify({"message": "File Has No Name / non existence"})
+    else:
+            return jsonify({"error": "No file selected for upload"})
 
 
-response = requests.post(
-    "https://ics-dev1-speech-to-text-quran.hf.space/run/predict",
-    json={
-        "data": [
-            {"name": "audio.wav", "data": base64_encoded_data}
-        ]
-    }
-)
-
-data = response.json()["data"]
+if __name__ == '__main__':
+    app.run(debug=True)
